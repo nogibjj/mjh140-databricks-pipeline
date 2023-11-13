@@ -16,11 +16,6 @@ from pyspark.sql.types import DoubleType, IntegerType, StringType, StructType, S
 
 # COMMAND ----------
 
-# Create a Spark session
-spark = SparkSession.builder.appName("NCAAB_SparkSession").getOrCreate()
-
-# COMMAND ----------
-
 # Returns an authenticated browser that can then be used to scrape pages that require authorization.
 browser = login('matthew.holden@duke.edu', 'ncaabstats24')
 
@@ -28,12 +23,6 @@ browser = login('matthew.holden@duke.edu', 'ncaabstats24')
 
 # Scrapes the Pomeroy College Basketball Ratings table (https://kenpom.com/index.php) into a dataframe.
 ratings = get_pomeroy_ratings(browser, season='2024')
-
-# Scrapes the Four Factors table (https://kenpom.com/stats.php) into a dataframe.
-factors = get_fourfactors(browser, season='2024')
-
-# Scrapes the Points distribution (2pt%, 3pt%, ft%, etc)
-pointdist = get_pointdist(browser, season='2024')
 
 # COMMAND ----------
 
@@ -64,9 +53,6 @@ ratings = ratings.dropna(subset=['Wins'])
 
 
 # COMMAND ----------
-
-# Create a Spark session
-spark = SparkSession.builder.appName("NCAAB_SparkSession").getOrCreate()
 
 # Define the schema for the DataFrame (must match the Pandas DataFrame schema)
 schema = StructType(
@@ -101,8 +87,3 @@ schema = StructType(
 ratings_df = spark.createDataFrame(ratings, schema=schema)
 
 ratings_df.createGlobalTempView("ratings_df_shared")
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC SELECT * FROM global_temp.ratings_df_shared
